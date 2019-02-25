@@ -1,10 +1,13 @@
 #ifndef LIBDOM_DOM_HPP
 #define LIBDOM_DOM_HPP
+
+
 #include <iostream>
 #include <functional>
 #include <chrono>
 #include <thread>
 #include <vector>
+#include <functional>
 
 namespace dom {
 
@@ -47,7 +50,7 @@ namespace dom {
 
 	public:
 
-		T* at(int index)
+        T* at(int index) const
 		{
 			return container.at(index);
 		}
@@ -130,7 +133,7 @@ namespace dom {
 			}
 		}
 
-		int size()
+        int size() const
 		{
 			return container.size();
 		}
@@ -164,9 +167,22 @@ namespace dom {
 	{
 	public: //API
 
+        explicit property()
+        {
+
+        }
+
+        explicit property(std::function<void()> listener)
+        {
+            dataChanged = listener;
+        }
+
+        std::function<void()> dataChanged;
+
 		void set(T newValue)
 		{
 			_val = newValue;
+            if (dataChanged) dataChanged();
 
 			dispatchNewValue(newValue, nullptr);
 
@@ -181,12 +197,14 @@ namespace dom {
 		void dispatchNewValue(T value, property<T>* ignore)
 		{
 			_val = value;
+            if (dataChanged) dataChanged();
 
 			for (auto& s : subscribers)
 			{
 				if (s != ignore)
 				{
 					s->_val = value;
+                    if (s->dataChanged) s->dataChanged();
 				}
 			}
 		}
@@ -200,6 +218,7 @@ namespace dom {
 					count++;
 			}
 			_val = count;
+            if (dataChanged) dataChanged();
 		}
 
 		void operator=(std::shared_ptr<IReducer> reduceView)
@@ -207,6 +226,7 @@ namespace dom {
 			// sourceView = view;
 
 			_val = reduceView->apply();
+            if (dataChanged) dataChanged();
 		}
 
 		void operator=(property<T>& value)
@@ -216,6 +236,7 @@ namespace dom {
 			value.subscribers.push_back(this);
 
 			_val = source->_val;
+            if (dataChanged) dataChanged();
 		}
 
 		bool operator==(T other)

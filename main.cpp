@@ -224,8 +224,8 @@ public:
         }
     }
 
-    dom::object<Trophy> warden;
-    dom::object<Building> prison; // used in trophy
+    //dom::object<Trophy> warden;
+    //dom::object<Building> prison; // used in trophy
 
 	dom::array<Building> buildings_model;
     dom::property<int> gold;

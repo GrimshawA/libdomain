@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>BGAlignmentEvil_Vertical.png</file>
+        <file>BGAlignmentGood_Vertical.png</file>
+        <file>BGAlignmentNeutral_Vertical.png</file>
+    </qresource>
+</RCC>

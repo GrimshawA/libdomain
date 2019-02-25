@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>GameView.qml</file>
+        <file>TrophyType.qml</file>
+        <file>qtquickcontrols2.conf</file>
+        <file>InfoPanel.qml</file>
+    </qresource>
+</RCC>

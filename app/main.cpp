@@ -3,10 +3,26 @@
 
 #include <src/game_view_model.hpp>
 
+#include "qdom.hpp"
+
+class X : public QObject {
+
+};
+
+class Y {
+
+};
+
 int main(int argc, char *argv[])
 {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QGuiApplication app(argc, argv);
+
+    // TESTS
+    std::cout << dom::object_traits<X>::name << std::endl;
+    std::cout << dom::object_traits<Y>::name << std::endl;
+
+    QDomModel<X> mm;
 
     qmlRegisterType<GameViewModel>("Game", 1, 0, "GameViewModel");
 

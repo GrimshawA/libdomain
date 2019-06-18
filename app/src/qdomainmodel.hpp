@@ -16,6 +16,60 @@
 #include <QVariant>
 #include <QVector>
 
+#include <map>
+#include <type_traits>
+
+#include "dom.hpp"
+
+namespace dom {
+// typename std::enable_if<std::is_base_of<QObject, T>::value>::type
+
+    // the partial specialization of A is enabled via a template parameter
+    template<class T, class Enable = void>
+    class object_traits {
+    public:
+
+        static const int name = 0;
+
+        inline static QVariant getData(T* elem, const std::string& roleName) {
+
+            auto result = elem->data(roleName);
+
+            return result;
+        }
+
+        inline static std::map<int, std::string> getRoles() {
+
+            std::map<int, std::string> roles;
+
+            T t;
+
+            int i = 0;
+            for (auto& r: t.roles) {
+                roles[i++] = r;
+            }
+
+            return roles;
+        }
+
+    }; // primary template
+
+    template<class T>
+    class object_traits<T, typename std::enable_if<std::is_base_of<QObject, T>::value>::type> {
+    public:
+        static const int name = 1;
+
+        inline static QVariant getData(T* elem, const std::string& roleName) {
+            return {};
+        }
+
+        inline static std::map<int, std::string> getRoles() {
+            return {};
+        }
+
+    }; // specialization for floating point types
+}
+
 template<typename T> QList<T> qListFromVariant (const QVariantList & list) {
     QList<T> ret;
     ret.reserve (list.size ());
@@ -49,14 +103,14 @@ public:
         : QAbstractListModel (parent)
         , m_count (0)
     {
-        ItemType p;
-
         m_roles[Qt::UserRole] = "qtObject";
 
+        auto roles = dom::object_traits<ItemType>::getRoles();
+
         int i = 1;
-        for (auto& r : p.roles)
+        for (auto& r : roles)
         {
-            std::string role = "x_" + r;
+            std::string role = "x_" + r.second;
             m_roles[Qt::UserRole + i] = role.c_str();
             ++i;
         }
@@ -73,7 +127,8 @@ public:
 
     QVariant data (const QModelIndex & index, int role) const {
         std::string roleName = m_roles[role].toStdString();
-        return m_items.at(index.row())->data(roleName);
+
+        return dom::object_traits<ItemType>::getData(m_items.at(index.row()), roleName);
     }
     QHash<int, QByteArray> roleNames (void) const {
         return m_roles;

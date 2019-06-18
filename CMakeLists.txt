@@ -5,13 +5,16 @@ enable_language(CXX)
 
 include_directories(src/)
 
-# app sample
-add_subdirectory(app)
+set(QT_SAMPLES true)
 
+if (QT_SAMPLES)
+    # app sample
+    add_subdirectory(app)
+endif()
 
 file(GLOB_RECURSE SOURCES "src/*.cpp" "src/*.h*")
 
-add_library(libdom SHARED ${SOURCES} src/dom.hpp)
+add_library(libdom SHARED ${SOURCES} src/dom.hpp src/dom_schema.hpp)
 set_target_properties(libdom PROPERTIES LINKER_LANGUAGE CXX)
 
 # Terminal sample

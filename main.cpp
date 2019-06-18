@@ -36,7 +36,24 @@ public:
     int cost;
     bool acquired;
     bool can_acquire;
+
+    std::vector<Building*> users; // this needs to be an automatic link in the schema
+
+
 };
+
+dom::schema schema = dom::schema{"Upgrade"}
+		.field("name", &Upgrade::name)
+		.field("cost", &Upgrade::cost)
+		.field("acquired", &Upgrade::acquired)
+		.field("can_acquire", &Upgrade::can_acquire);
+
+namespace dom {
+	template<>
+	schema& get_schema_for<Upgrade>(){
+		return ::schema;
+	}
+}
 
 class Trophy {
 public:
@@ -267,6 +284,13 @@ void initData() {
 
 int main(int argc, char *argv[])
 {
+	auto& sch = dom::get_schema_for<Upgrade>();
+	auto& sch2 = dom::get_schema_for<User>();
+
+	std::cout << "sch1 " << sch.typeName << std::endl;
+	sch.debug();
+	std::cout << "sch2 " << sch2.typeName << std::endl;
+
     // While the view model lives, all the data is ready for a view to consume
 
     // Init some

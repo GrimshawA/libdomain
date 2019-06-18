@@ -1,13 +1,7 @@
 #ifndef LIBDOM_DOM_HPP
 #define LIBDOM_DOM_HPP
 
-
-#include <iostream>
-#include <functional>
-#include <chrono>
-#include <thread>
-#include <vector>
-#include <functional>
+#include "dom_schema.hpp"
 
 namespace dom {
 

@@ -116,6 +116,11 @@ public:
         }
     }
 
+    typename dom::array<ItemType>::view select(std::function<bool(ItemType&)> pred)
+    {
+        return m_items.select(pred);
+    }
+
     void operator=(typename dom::array<ItemType>::view v)
     {
         m_items = v;
@@ -190,9 +195,9 @@ public: // C++ API
     }
     void append (ItemType * item) {
         if (item != Q_NULLPTR) {
-            const int pos = m_items.count ();
+            const int pos = m_items.size ();
             beginInsertRows (noParent (), pos, pos);
-            m_items.append (item);
+            m_items.push (item);
             referenceItem (item);
             endInsertRows ();
             updateCounter ();
@@ -423,7 +428,7 @@ protected: // internal stuff
         }*/
     }
 
-private: // data members
+public: // data members
     int                        m_count;
     QByteArray                 m_uidRoleName;
     QByteArray                 m_dispRoleName;

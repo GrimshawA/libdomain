@@ -64,10 +64,21 @@ namespace dom {
         }
 
         inline static std::map<int, std::string> getRoles() {
-            return {};
+            std::map<int, std::string> roles;
+
+            auto* metaobject = &T::staticMetaObject;
+            int count = metaobject->propertyCount();
+
+            for (int i=0; i<count; ++i) {
+                QMetaProperty metaproperty = metaobject->property(i);
+                const char *name = metaproperty.name();
+                roles[i] = name;
+                qDebug() << "ROLE: " << name;
+            }
+            return roles;
         }
 
-    }; // specialization for floating point types
+    };
 }
 
 template<typename T> QList<T> qListFromVariant (const QVariantList & list) {
@@ -131,6 +142,11 @@ public:
     }
 
     QVariant data (const QModelIndex & index, int role) const {
+        if (role == Qt::UserRole)
+        {
+            return QVariant::fromValue<QObject*>(m_items.at(index.row()));
+        }
+
         std::string roleName = m_roles[role].toStdString();
 
         return dom::object_traits<ItemType>::getData(m_items.at(index.row()), roleName);
@@ -157,7 +173,7 @@ public: // C++ API
     ItemType * at (int idx) const {
         ItemType * ret = Q_NULLPTR;
         if (idx >= 0 && idx < m_items.size ()) {
-            ret = m_items.value (idx);
+            ret = m_items.at (idx);
         }
         return ret;
     }

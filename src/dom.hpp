@@ -16,6 +16,8 @@ namespace dom {
 	{
 	public:
 
+            using iterator = typename std::vector<T*>::iterator;
+
 		struct view
 		{
 			array<T>* source = nullptr;
@@ -97,14 +99,14 @@ namespace dom {
 
 		}
 
-		typename std::vector<T*>::iterator begin()
+                iterator begin()
 		{
-			return container.begin();
+                    return container.begin();
 		}
 
-		typename std::vector<T*>::iterator end()
+                iterator end()
 		{
-			return container.end();
+                    return container.end();
 		}
 
 		void push(T* value)
@@ -131,6 +133,18 @@ namespace dom {
 		{
 			return container.size();
 		}
+
+        T* remove(int idx)
+        {
+            T* ptr = container[idx];
+            container.erase(container.begin() + idx);
+            return ptr;
+        }
+
+        void insert(int idx, T* elem)
+        {
+            container.insert(container.begin() + idx, elem);
+        }
 
 		view select(std::function<bool(T&)> pred)
 		{

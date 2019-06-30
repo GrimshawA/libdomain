@@ -154,11 +154,13 @@ public:
     QHash<int, QByteArray> roleNames (void) const {
         return m_roles;
     }
-    typedef typename QList<ItemType *>::iterator iterator;
-    iterator begin (void) const {
+
+    using iterator = typename dom::array<ItemType>::iterator;
+
+    iterator begin (void) {
         return m_items.begin ();
     }
-    iterator end (void) const {
+    iterator end (void) {
         return m_items.end ();
     }
     typedef typename QList<ItemType *>::const_iterator const_iterator;
@@ -187,7 +189,7 @@ public: // C++ API
         return m_count;
     }
     int size (void) const {
-        return m_count;
+        return m_items.size();
     }
     bool isEmpty (void) const {
         return m_items.isEmpty ();
@@ -229,11 +231,13 @@ public: // C++ API
         }
     }
     void insert (int idx, ItemType * item) {
+        beginInsertRows (noParent (), idx, idx);
+        m_items.insert (idx, item);
+
+        endInsertRows ();
+
         if (item != Q_NULLPTR) {
-            beginInsertRows (noParent (), idx, idx);
-            m_items.insert (idx, item);
             referenceItem (item);
-            endInsertRows ();
             updateCounter ();
         }
     }
@@ -293,14 +297,16 @@ public: // C++ API
             remove (idx);
         }
     }
-    void remove (int idx) {
+    ItemType* remove (int idx) {
         if (idx >= 0 && idx < m_items.size ()) {
             beginRemoveRows (noParent (), idx, idx);
-            ItemType * item = m_items.takeAt (idx);
+            ItemType * item = m_items.remove (idx);
             dereferenceItem (item);
             endRemoveRows ();
             updateCounter ();
+            return item;
         }
+        return nullptr;
     }
     ItemType * first (void) const {
         return m_items.first ();
@@ -405,7 +411,7 @@ protected: // internal stuff
                 }
             }
             if (item->parent () == this) { // FIXME : maybe that's not the best way to test ownership ?
-                item->deleteLater ();
+                //item->deleteLater ();
             }
         }
     }
